@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, Alert} from 'react-native';
 import {
   Avatar,
@@ -13,13 +13,19 @@ import useStore from '../../hooks/useStore';
 import UpdatePost from '../UpdatePost/UpdatePost';
 
 const SinglePost = ({post}) => {
-  const {user, posts, setPosts} = useStore();
+  const {user, posts, setPosts, getSingleUserByEmail} = useStore();
   const [show, setShow] = useState(false);
-  const [updateShow, setUpdateShow] = useState(false);
   const [more, setMore] = useState(false);
-  const {_id, name, postText, date, like, comment, email, photoURL} = post;
+  const [updateShow, setUpdateShow] = useState(false);
+  const [postUser, setPostUser] = useState({});
+
+  const {_id, name, postText, date, like, comment, email} = post;
   const displayDate = new Date(date);
 
+  useEffect(() => {
+    getSingleUserByEmail(email, setPostUser);
+  }, [getSingleUserByEmail, email]);
+  // delete post
   const handleDeletePost = id => {
     fetch(`http://192.168.43.64:5000/posts/${id}`, {
       method: 'DELETE',
@@ -36,6 +42,50 @@ const SinglePost = ({post}) => {
         }
       });
   };
+  // handle like function
+
+  let isLike = like.find(item => item === user.email);
+  const handleLike = id => {
+    let likes = [...like];
+    for (let newPost of posts) {
+      if (newPost._id === id) {
+        if (newPost.like.length) {
+          const isFindEmail = newPost.like.find(item => item === user.email);
+          if (isFindEmail) {
+            likes = newPost.like.filter(item => item !== user.email);
+          } else {
+            likes.push(user.email);
+          }
+        } else {
+          likes.push(user.email);
+          console.log('hello');
+        }
+        newPost.like = likes;
+      }
+    }
+
+    fetch(`http://192.168.43.64:5000/likes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(likes),
+    })
+      .then(res => res.json())
+      .then(result => {
+        // console.log(result);
+        if (result.acknowledged) {
+          let updatePost = [];
+          for (let applyPost of posts) {
+            if (applyPost._id === id) {
+              applyPost.like = likes;
+            }
+            updatePost.push(applyPost);
+          }
+          setPosts(updatePost);
+        }
+      });
+  };
   return (
     <View>
       <Card style={{marginBottom: 20, zIndex: -1}}>
@@ -47,7 +97,7 @@ const SinglePost = ({post}) => {
                 style={{marginTop: 5}}
                 source={{
                   uri:
-                    photoURL ||
+                    postUser.photoURL ||
                     'https://icons-for-free.com/iconfiles/png/512/business+costume+male+man+office+user+icon-1320196264882354682.png',
                 }}
               />
@@ -59,7 +109,7 @@ const SinglePost = ({post}) => {
                 style={{height: 25, width: 25}}
                 onPress={() => setShow(!show)}
                 rippleColor="rgba(0, 0, 0, .32)">
-                <Avatar.Icon size={24} icon="dots-vertical" />
+                <Avatar.Icon size={24} icon="dots-horizontal" />
               </TouchableRipple>
             )}
             {show && (
@@ -129,7 +179,9 @@ const SinglePost = ({post}) => {
             <TouchableRipple
               onPress={() => {}}
               rippleColor="rgba(0, 0, 0, .32)">
-              <Button>{like} Like</Button>
+              <Button onPress={() => handleLike(_id)}>
+                {like?.length} {isLike ? 'Unlike' : 'Like'}
+              </Button>
             </TouchableRipple>
             <TouchableRipple
               onPress={() => {}}

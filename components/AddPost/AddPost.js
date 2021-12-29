@@ -3,10 +3,9 @@ import React, {useState} from 'react';
 import {View, TextInput, Alert} from 'react-native';
 import {Button, TouchableRipple} from 'react-native-paper';
 import useStore from '../../hooks/useStore';
-
 const AddPost = () => {
   const [postText, setPostText] = useState('');
-  const {user, posts, setPosts, profileUser} = useStore();
+  const {user, posts, setPosts} = useStore();
   const onSubmitPost = () => {
     if (!postText) {
       Alert.alert('Post text should not empty');
@@ -17,10 +16,9 @@ const AddPost = () => {
       name: user.displayName,
       email: user.email,
       postText,
-      like: 0,
+      like: [],
       comment: [],
       date,
-      photoURL: profileUser.photoURL,
     };
     fetch('http://192.168.43.64:5000/posts', {
       method: 'POST',
@@ -54,8 +52,9 @@ const AddPost = () => {
           marginBottom: 10,
         }}
         onChangeText={text => setPostText(text)}
-        placeholder="You can type in me"
+        placeholder="You can post text here"
       />
+
       <View style={{width: 90}}>
         <TouchableRipple
           onPress={() => console.log('Pressed')}

@@ -82,7 +82,12 @@ const useFirebase = () => {
   // get a single profile user data
   // get single user
   useEffect(() => {
-    fetch(`http://192.168.43.64:5000/users/${user.email}`, {
+    getSingleUserByEmail(user.email, setProfileUser);
+  }, [user.email]);
+
+  // single user get function
+  const getSingleUserByEmail = (email, setProfileUser) => {
+    fetch(`http://192.168.43.64:5000/users/${email}`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -90,7 +95,7 @@ const useFirebase = () => {
     })
       .then(res => res.json())
       .then(data => setProfileUser(data));
-  }, [user.email]);
+  };
   return {
     registerWithEmailAndPassword,
     signInUsingEmailAndPassword,
@@ -100,6 +105,7 @@ const useFirebase = () => {
     setUser,
     profileUser,
     setProfileUser,
+    getSingleUserByEmail,
   };
 };
 

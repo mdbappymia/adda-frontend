@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import {ActivityIndicator, RefreshControl, Text, View} from 'react-native';
 import useStore from '../../hooks/useStore';
 import AddPost from '../AddPost/AddPost';
 import AllPost from '../AllPost/AllPost';
@@ -35,7 +29,7 @@ const Home = () => {
     <View>
       <AppBar />
 
-      <ScrollView
+      <View
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -52,7 +46,7 @@ const Home = () => {
         )}
 
         <AllPost />
-      </ScrollView>
+      </View>
     </View>
   );
 };

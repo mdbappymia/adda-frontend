@@ -8,7 +8,7 @@ import useStore from '../../hooks/useStore';
 const AppBar = () => {
   const navigation = useNavigation();
   const [submenuShow, setSubmenuShow] = useState(false);
-  const {logOut, user} = useStore();
+  const {logOut, user, setSearchText} = useStore();
   return (
     <View>
       <Appbar.Header>
@@ -20,6 +20,7 @@ const AppBar = () => {
         />
         <View>
           <Searchbar
+            onChangeText={text => setSearchText(text)}
             style={{width: 200, height: 45, margin: 0, padding: 0}}
             placeholder="Search"
           />
@@ -45,14 +46,20 @@ const AppBar = () => {
           {user?.email ? (
             <View>
               <TouchableRipple
-                onPress={() => navigation.navigate('Profile')}
+                onPress={() => {
+                  navigation.navigate('Profile');
+                  setSubmenuShow(false);
+                }}
                 rippleColor="rgba(0, 0, 0, .32)">
                 <Text style={{color: 'white', padding: 10}}>
                   {user.displayName}
                 </Text>
               </TouchableRipple>
               <TouchableRipple
-                onPress={logOut}
+                onPress={() => {
+                  logOut();
+                  setSubmenuShow(false);
+                }}
                 rippleColor="rgba(0, 0, 0, .32)">
                 <Text style={{color: 'white', padding: 10}}>Logout</Text>
               </TouchableRipple>
@@ -60,12 +67,18 @@ const AppBar = () => {
           ) : (
             <View>
               <TouchableRipple
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => {
+                  navigation.navigate('Login');
+                  setSubmenuShow(false);
+                }}
                 rippleColor="rgba(0, 0, 0, .32)">
                 <Text style={{color: 'white', padding: 10}}>Login</Text>
               </TouchableRipple>
               <TouchableRipple
-                onPress={() => navigation.navigate('Register')}
+                onPress={() => {
+                  navigation.navigate('Register');
+                  setSubmenuShow(false);
+                }}
                 rippleColor="rgba(0, 0, 0, .32)">
                 <Text style={{color: 'white', padding: 10}}>Register</Text>
               </TouchableRipple>
